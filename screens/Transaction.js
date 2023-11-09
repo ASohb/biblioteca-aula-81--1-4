@@ -70,12 +70,13 @@ export default class TransactionScreen extends Component {
     await this.getBookDetails(bookId);
     await this.getStudentDetails(studentId);
 
-    db.collection("books")
-      .doc(bookId)
-      .get()
-      .then(doc => {
-        var book = doc.data();
-        if (book.is_book_available) {
+    var transactiontype= await this.checkBookAvailability(bookId);
+
+      if (!transactiontype){
+        this.setState({bookId: "", studentId: ""});
+        Alert.alert("O livro não existe no banco de dados da biblioteca");
+      }
+       else if (transactionType == "issue") {
           var { bookName, studentName } = this.state;
           this.initiateBookIssue(bookId, studentId, bookName, studentName);
 
@@ -95,7 +96,7 @@ export default class TransactionScreen extends Component {
 
           Alert.alert("Livro retornado à biblioteca!");
         }
-      });
+     
   };
 
   getBookDetails = bookId => {
